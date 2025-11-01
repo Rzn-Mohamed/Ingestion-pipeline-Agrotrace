@@ -33,3 +33,17 @@ services:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: password 
       POSTGRES_DB: agrotrace_db
+
+  # 4. Service d'ingestion
+  ingestion-service:
+    build:
+      context: ./ingestion-capteurs
+      dockerfile: Dockerfile
+    container_name: ingestion-service
+    depends_on:
+      - kafka
+    ports:
+      - "8000:8000"
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+    restart: unless-stopped
