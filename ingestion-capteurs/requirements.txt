@@ -3,3 +3,6 @@ uvicorn[standard]
 pydantic
 confluent-kafka
 psycopg2-binary
+python-dotenv
+websockets
+requests
