@@ -67,3 +67,41 @@ services:
       DB_PASSWORD: password
     command: ["python", "-m", "app.consumer"]
     restart: unless-stopped
+
+  # 6. Simulator HTTP (envoie données aux capteurs)
+  simulator:
+    build:
+      context: ./ingestion-capteurs/simulator
+      dockerfile: Dockerfile
+    container_name: simulator
+    depends_on:
+      - ingestion-service
+    ports:
+      - "8001:8001"
+    environment:
+      INGESTION_URL: http://ingestion-service:8000/ingest
+    restart: unless-stopped
+
+  # 7. Adminer (UI pour TimescaleDB)
+  adminer:
+    image: adminer:latest
+    container_name: adminer
+    ports:
+      - "8080:8080"
+    depends_on:
+      - timescaledb
+    restart: unless-stopped
+
+  # 8. Kafka UI
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    ports:
+      - "8888:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: agrotrace
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+    depends_on:
+      - kafka
+    restart: unless-stopped

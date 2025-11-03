@@ -1,0 +1,28 @@
+COMMANDES DE TEST
+
+1. Lancer tout:
+   docker-compose up -d
+
+2. Vérifier que tout démarre:
+   docker-compose logs -f simulator
+
+3. Vérifier la chaîne complète:
+
+   a) Simulator envoie au service:
+      curl http://localhost:8001/health
+      curl http://localhost:8000/health
+
+   b) Données dans Kafka (kafka-ui):
+      http://localhost:8888
+      Aller à "Topics" → "capteur_data" → voir les messages
+
+   c) Données dans TimescaleDB (adminer):
+      http://localhost:8080
+      Login: admin / password
+      Sélectionner BDD "agrotrace_db" → voir table "capteur_data"
+
+4. Arrêter:
+   docker-compose down
+
+FLUX DE TEST:
+simulator → (HTTP POST) → ingestion-service → (Kafka) → consumer → (SQL INSERT) → timescaledb
