@@ -79,7 +79,7 @@ def create_table_if_not_exists() -> None:
         
         # Créer la table
         cursor.execute("""
-            CREATE TABLE IF NOT EXISTS capteur_data (
+            CREATE TABLE IF NOT EXISTS raw_capteur_data (
                 id SERIAL,
                 capteur_id VARCHAR(50) NOT NULL,
                 timestamp TIMESTAMPTZ NOT NULL,
@@ -88,18 +88,19 @@ def create_table_if_not_exists() -> None:
                 humidite_sol DOUBLE PRECISION,
                 niveau_ph DOUBLE PRECISION,
                 luminosite DOUBLE PRECISION,
+                is_cleaned BOOLEAN NOT NULL DEFAULT FALSE,
                 PRIMARY KEY (capteur_id, timestamp)
             );
         """)
         
         # Convertir en hypertable TimescaleDB si ce n'est pas déjà fait
         cursor.execute("""
-            SELECT create_hypertable('capteur_data', 'timestamp', 
+            SELECT create_hypertable('raw_capteur_data', 'timestamp', 
                                       if_not_exists => TRUE);
         """)
         
         db_connection.commit()
-        logger.info("Table 'capteur_data' créée/vérifiée avec succès")
+        logger.info("Table 'raw_capteur_data' créée/vérifiée avec succès")
         cursor.close()
         
     except Exception as e:
@@ -124,15 +125,16 @@ def insert_capteur_data(data: Dict[str, Any]) -> bool:
         cursor = db_connection.cursor()
         
         insert_query = """
-            INSERT INTO capteur_data 
-            (capteur_id, timestamp, temperature, humidite, humidite_sol, niveau_ph, luminosite)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO raw_capteur_data 
+            (capteur_id, timestamp, temperature, humidite, humidite_sol, niveau_ph, luminosite, is_cleaned)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (capteur_id, timestamp) DO UPDATE SET
                 temperature = EXCLUDED.temperature,
                 humidite = EXCLUDED.humidite,
                 humidite_sol = EXCLUDED.humidite_sol,
                 niveau_ph = EXCLUDED.niveau_ph,
-                luminosite = EXCLUDED.luminosite;
+                luminosite = EXCLUDED.luminosite,
+                is_cleaned = EXCLUDED.is_cleaned;
         """
         
         cursor.execute(insert_query, (
@@ -142,7 +144,8 @@ def insert_capteur_data(data: Dict[str, Any]) -> bool:
             data.get('humidite'),
             data.get('humidite_sol'),
             data.get('niveau_ph'),
-            data.get('luminosite')
+            data.get('luminosite'),
+            False  
         ))
         
         db_connection.commit()
