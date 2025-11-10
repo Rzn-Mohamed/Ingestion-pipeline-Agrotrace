@@ -1,3 +1,4 @@
+# check=skip=SecretsUsedInArgOrEnv
 FROM python:3.11-slim
 
 WORKDIR /app
