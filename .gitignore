@@ -70,3 +70,4 @@ Thumbs.db
 *.temp
 *.bak
 RESET.md
+sonar-project.properties
