@@ -249,7 +249,6 @@ python simulator/http_simulator.py
 |---------|----------|-------------|
 | `GET` | `/health` | Vérification de l'état du service |
 | `POST` | `/ingest` | Ingestion des données capteur |
-| `GET` | `/docs` | Documentation Swagger |
 
 ### Exemple d'Ingestion
 
@@ -421,7 +420,6 @@ docker logs -f etl-worker
 |-----------|-----|-------------|
 | **Kafka UI** | http://localhost:8888 | Visualisation topics et messages |
 | **Adminer** | http://localhost:8080 | Gestion base de données |
-| **Swagger** | http://localhost:8000/docs | Documentation API |
 | **SonarQube** | http://localhost:9000 | Qualité du code |
 
 ### Connexion Adminer
@@ -526,11 +524,6 @@ docker logs -f etl-worker
 
 - [x] **Phase 1** : Ingestion temps réel (API → Kafka → DB)
 - [x] **Phase 2** : Pipeline ETL Bronze-Silver-Gold
-
-### 🔜 À Venir
-
-- [ ] **Phase 3** : Modèles ML de prédiction
-- [ ] **Phase 4** : Dashboard temps réel et alertes
 
 ---
 
